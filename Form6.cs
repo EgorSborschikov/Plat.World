@@ -35,19 +35,20 @@ namespace Plat.World
             labelScore.Location = new Point(810, 10);
             this.Controls.Add(labelScore);
             snake[0] = new PictureBox();
-            snake[0].Location = new Point(200,200);
-            snake[0].Size = new Size(_sizeOfSides-1, _sizeOfSides-1);
+            snake[0].Location = new Point(200, 200);
+            snake[0].Size = new Size(_sizeOfSides - 1, _sizeOfSides - 1);
             snake[0].BackColor = Color.Red;
             this.Controls.Add(snake[0]);
             fruit = new PictureBox();
             fruit.BackColor = Color.Yellow;
-            fruit.Size = new Size(_sizeOfSides,_sizeOfSides);
+            fruit.Size = new Size(_sizeOfSides, _sizeOfSides);
             _generateMap();
             _generateFruit();
             timer1.Tick += new EventHandler(_update);
             timer1.Interval = 500;
             timer1.Start();
             this.KeyDown += new KeyEventHandler(OKP);
+            this.KeyPress += new KeyPressEventHandler(moveSnake);
         }
 
         private void Form6_Load(object sender, EventArgs e)
@@ -163,21 +164,41 @@ namespace Plat.World
             }
         }
 
-        private void _moveSnake()
+        private void moveSnake(object sender, KeyPressEventArgs e)
         {
-            for (int i = score; i >= 1; i--)
+            
+
+            switch (e.KeyChar)
             {
-                snake[i].Location = snake[i - 1].Location;
+                case 'd':
+                case 'D':
+                    dirX = 1;
+                    dirY = 0;
+                    break;
+                case 'a':
+                case 'A':
+                    dirX = -1;
+                    dirY = 0;
+                    break;
+                case 'w':
+                case 'W':
+                    dirY = -1;
+                    dirX = 0;
+                    break;
+                case 's':
+                case 'S':
+                    dirY = 1;
+                    dirX = 0;
+                    break;
             }
-            snake[0].Location = new Point(snake[0].Location.X + dirX * (_sizeOfSides), snake[0].Location.Y + dirY * (_sizeOfSides));
-            _eatItself();
         }
 
         private void _update(Object myObject, EventArgs eventArgs)
         {
             _checkBorders();
             _eatFruit();
-            _moveSnake();
+            KeyPressEventArgs e = new KeyPressEventArgs((char)0);
+            moveSnake(this, e);
             //cube.Location = new Point(cube.Location.X + dirX * _sizeOfSides, cube.Location.Y + dirY * _sizeOfSides);
         }
 
