@@ -38,25 +38,6 @@ namespace Plat.World
                     this.Controls.Add(buttons[i, j]);
                 }
             }
-            setButtons();
-        }
-
-        private void setButtons()
-        {
-            for (int i = 0; i < buttons.Length / 3; i++)
-            {
-                for (int j = 0; j < buttons.Length / 3; j++)
-                {
-                    Button button = new Button();
-                    button.Size = new Size(200, 200);
-                    button.Location = new Point(12 + 201 * j, 12 + 201 * i);
-                    button.Click += button1_Click;
-                    button.Font = new Font(new FontFamily("Microsoft Sans Serif"), 138);
-
-                    buttons[i, j] = button;
-                    this.Controls.Add(buttons[i, j]);
-                }
-            }
         }
 
         private void button1_Click(object sender, EventArgs e)
