@@ -48,6 +48,7 @@ namespace Plat.World
             timer1.Interval = 500;
             timer1.Start();
             this.KeyDown += new KeyEventHandler(OKP);
+            this.KeyPreview = true;
         }
 
         private void Form6_Load(object sender, EventArgs e)
@@ -58,23 +59,32 @@ namespace Plat.World
         private void _generateFruit()
         {
             Random r = new Random();
-            rI = r.Next(0,_height-_sizeOfSides);
-            int tempI = rI % _sizeOfSides;
-            rI -= tempI;
-            rJ = r.Next(0, _height - _sizeOfSides);
-            int tempJ = rJ % _sizeOfSides;
-            rJ -= tempJ;
-            rI++;
-            rJ++;
-            fruit.Location = new Point(rI, rJ);
-            this.Controls.Add(fruit);
+            int attempts = 0;
+            do
+            {
+                rI = r.Next(0, _width - _sizeOfSides);
+                rJ = r.Next(0, _height - _sizeOfSides);
+                attempts++;
+            } while (snake.Any(s => s != null && s.Location.X == rI && s.Location.Y == rJ) && attempts < 100);
+
+            if (attempts < 100)
+            {
+                fruit.Location = new Point(rI, rJ);
+                this.Controls.Add(fruit);
+            }
+            else
+            {
+                // Обработка ситуации, когда змея заполнила все поле
+                MessageBox.Show("Игра окончена. Змея заполнила все поле.");
+                timer1.Stop();
+            }
         }
 
         private void _checkBorders()
         {
-            if (snake[0].Location.X<0)
+            if (snake[0].Location.X < 0)
             {
-                for (int _i=1;_i<=score;_i++)
+                for (int _i = 1; _i <= score; _i++)
                 {
                     this.Controls.Remove(snake[_i]);
                 }
@@ -82,7 +92,7 @@ namespace Plat.World
                 labelScore.Text = "Score: " + score;
                 dirX = 1;
             }
-            if (snake[0].Location.X > _height)
+            if (snake[0].Location.X >= _width - _sizeOfSides)
             {
                 for (int _i = 1; _i <= score; _i++)
                 {
@@ -102,7 +112,7 @@ namespace Plat.World
                 labelScore.Text = "Score: " + score;
                 dirY = 1;
             }
-            if (snake[0].Location.Y > _height)
+            if (snake[0].Location.Y >= _height - _sizeOfSides)
             {
                 for (int _i = 1; _i <= score; _i++)
                 {
@@ -116,27 +126,29 @@ namespace Plat.World
 
         private void _eatItself()
         {
-            for (int _i=1;_i<score;_i++)
+            for (int i = 1; i < score; i++)
             {
-                if (snake[0].Location == snake[_i].Location)
+                if (snake[0].Location == snake[i].Location)
                 {
-                    for (int _j = _i; _j < score; _j++)
+                    for (int j = i; j < score; j++)
                     {
-                        this.Controls.Remove(snake[_j]);
-                        score = score - (score - _i + 1);
+                        this.Controls.Remove(snake[j]);
                     }
+                    score = i;
+                    labelScore.Text = "Score: " + score;
+                    break;
                 }
             }
         }
 
         private void _eatFruit()
         {
-            if(snake[0].Location.X == rI && snake[0].Location.Y == rJ)
+            if (snake[0].Location.X == rI && snake[0].Location.Y == rJ)
             {
-                labelScore.Text = "Scor: " + ++score;
+                labelScore.Text = "Score: " + ++score;
                 snake[score] = new PictureBox();
-                snake[score].Location = new Point(snake[score - 1].Location.X + 40 * dirX, snake[score - 1].Location.Y - 40 * dirY);
-                snake[score].Size = new Size(_sizeOfSides-1, _sizeOfSides-1);
+                snake[score].Location = new Point(snake[score - 1].Location.X + dirX * _sizeOfSides, snake[score - 1].Location.Y + dirY * _sizeOfSides);
+                snake[score].Size = new Size(_sizeOfSides - 1, _sizeOfSides - 1);
                 snake[score].BackColor = Color.Red;
                 this.Controls.Add(snake[score]);
                 _generateFruit();
@@ -169,13 +181,35 @@ namespace Plat.World
             {
                 snake[i].Location = snake[i - 1].Location;
             }
-            snake[0].Location = new Point(snake[0].Location.X + dirX * (_sizeOfSides), snake[0].Location.Y + dirY * (_sizeOfSides));
+
+            int newX = (snake[0].Location.X + dirX * _sizeOfSides) % _width;
+            int newY = (snake[0].Location.Y + dirY * _sizeOfSides) % _height;
+
+            if (newX < 0)
+            {
+                newX += _width;
+            }
+
+            if (newY < 0)
+            {
+                newY += _height;
+            }
+
+            snake[0].Location = new Point(newX, newY);
             _eatItself();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Form2 frm2 = new Form2();
+            frm2.Show();
+            this.Close();
         }
 
         private void _update(Object myObject, EventArgs eventArgs)
         {
             _checkBorders();
+            _eatItself();
             _eatFruit();
             _moveSnake();
             //cube.Location = new Point(cube.Location.X + dirX * _sizeOfSides, cube.Location.Y + dirY * _sizeOfSides);
@@ -183,23 +217,35 @@ namespace Plat.World
 
         private void OKP(object sender,KeyEventArgs e)
         {
-            switch(e.KeyCode.ToString())
+               switch (e.KeyCode.ToString())
             {
-                case "Right":
-                    dirX = 1;
-                    dirY = 0;
+                case "D":
+                    if (dirX != -1)
+                    {
+                        dirX = 1;
+                        dirY = 0;
+                    }
                     break;
-                case "Left":
-                    dirX = -1;
-                    dirY = 0;
+                case "A":
+                    if (dirX != 1)
+                    {
+                        dirX = -1;
+                        dirY = 0;
+                    }
                     break;
-                case "Up":
-                    dirY = -1;
-                    dirX = 0;
+                case "W":
+                    if (dirY != 1)
+                    {
+                        dirY = -1;
+                        dirX = 0;
+                    }
                     break;
-                case "Down":
-                    dirY = 1;
-                    dirX = 0;
+                case "S":
+                    if (dirY != -1)
+                    {
+                        dirY = 1;
+                        dirX = 0;
+                    }
                     break;
             }
         }
