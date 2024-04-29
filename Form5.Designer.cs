@@ -143,28 +143,31 @@
             // 
             // button10
             // 
+            this.button10.BackColor = System.Drawing.SystemColors.Info;
             this.button10.Location = new System.Drawing.Point(884, 246);
             this.button10.Name = "button10";
             this.button10.Size = new System.Drawing.Size(132, 59);
             this.button10.TabIndex = 10;
             this.button10.Text = "Restart Game";
-            this.button10.UseVisualStyleBackColor = true;
+            this.button10.UseVisualStyleBackColor = false;
             this.button10.Click += new System.EventHandler(this.button10_Click);
             // 
             // button11
             // 
+            this.button11.BackColor = System.Drawing.SystemColors.Info;
             this.button11.Location = new System.Drawing.Point(12, 12);
             this.button11.Name = "button11";
             this.button11.Size = new System.Drawing.Size(132, 63);
             this.button11.TabIndex = 11;
             this.button11.Text = "button11";
-            this.button11.UseVisualStyleBackColor = true;
+            this.button11.UseVisualStyleBackColor = false;
             this.button11.Click += new System.EventHandler(this.button11_Click);
             // 
             // Form5
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(1156, 641);
             this.Controls.Add(this.button11);
             this.Controls.Add(this.button10);
